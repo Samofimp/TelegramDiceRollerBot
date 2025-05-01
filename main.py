@@ -123,19 +123,24 @@ async def roll(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 
         random.seed(time.time())
         successes = 0
+        has_one = False
+        has_success = False
         for i in range(0, dice_amount):
             single_throw = random.randint(1, 10)
             if single_throw == 1:
                 successes -= 1
+                has_one = True
             elif single_throw == 10:
                 successes += 2
+                has_success = True
             elif single_throw >= dice_difficulty:
                 successes += 1
+                has_success = True
 
         # Print result
-        if successes < 0:
+        if successes < 0 and has_one and not has_success:
             await update.message.reply_text(f"`{dice_throw}`: *Botch\\!*", parse_mode=ParseMode.MARKDOWN_V2)
-        elif successes == 0:
+        elif successes <= 0:
             await update.message.reply_text(f"`{dice_throw}`: *Failure\\!*", parse_mode=ParseMode.MARKDOWN_V2)
         elif successes == 1:
             await update.message.reply_text(f"`{dice_throw}`: *1* success", parse_mode=ParseMode.MARKDOWN_V2)
@@ -197,15 +202,20 @@ async def full(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 
         random.seed(time.time())
         successes = 0
+        has_success = False
+        has_one = False
         throw_list = "\\["
 
         for i in range(0, dice_amount):
             single_throw = random.randint(1, 10)
             if single_throw == 1:
+                has_one = True
                 successes -= 1
             elif single_throw == 10:
+                has_success = True
                 successes += 2
             elif single_throw >= dice_difficulty:
+                has_success = True
                 successes += 1
             if i == dice_amount - 1:
                 throw_list = f"{throw_list}{single_throw}\\]"
@@ -213,9 +223,9 @@ async def full(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
                 throw_list = f"{throw_list}{single_throw},"
 
         # Print result
-        if successes < 0:
+        if successes < 0 and has_one and not has_success:
             await update.message.reply_text(f"`{dice_throw}`: *Botch\\!* `{throw_list}`", parse_mode=ParseMode.MARKDOWN_V2)
-        elif successes == 0:
+        elif successes <= 0:
             await update.message.reply_text(f"`{dice_throw}`: *Failure\\! `{throw_list}`*", parse_mode=ParseMode.MARKDOWN_V2)
         elif successes == 1:
             await update.message.reply_text(f"`{dice_throw}`: *1* success `{throw_list}`", parse_mode=ParseMode.MARKDOWN_V2)
